@@ -9,6 +9,8 @@ const api = axios.create({
   },
 })
 
+// TEMPORARILY DISABLED FOR DEVELOPMENT - Remove comments to re-enable auth headers
+/*
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token')
@@ -21,7 +23,10 @@ api.interceptors.request.use(
     return Promise.reject(error)
   }
 )
+*/
 
+// TEMPORARILY DISABLED FOR DEVELOPMENT - Remove comments to re-enable auth redirection
+/*
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -32,5 +37,6 @@ api.interceptors.response.use(
     return Promise.reject(error)
   }
 )
+*/
 
 export default api

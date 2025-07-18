@@ -6,16 +6,19 @@ interface CryptoData {
   symbol: string
   name: string
   price: number
-  change24h: number
-  volume: number
-  marketCap: number
+  change24h?: number
+  volume?: number
+  marketCap?: number
   timestamp: string
 }
 
 interface CryptoHistory {
   id: string
   symbol: string
-  searchedAt: string
+  price: number
+  volume?: number
+  change24h?: number
+  timestamp: string
   userId: string
 }
 
@@ -32,6 +35,23 @@ export const useCryptoStore = defineStore('crypto', () => {
       error.value = null
       
       currentCrypto.value = await cryptoService.getCryptoData(symbol)
+      
+      // Save to history if user is authenticated (disabled during development)
+      // Uncomment when authentication is re-enabled
+      /*
+      try {
+        await cryptoService.saveToHistory(
+          symbol, 
+          currentCrypto.value.price,
+          currentCrypto.value.volume || 0,
+          currentCrypto.value.change24h || 0
+        )
+        await fetchSearchHistory() // Refresh history
+      } catch (historyErr) {
+        console.log('History save failed (might not be logged in):', historyErr)
+      }
+      */
+      
       return true
     } catch (err: any) {
       error.value = err.response?.data?.message || 'Failed to fetch crypto data'
@@ -59,7 +79,8 @@ export const useCryptoStore = defineStore('crypto', () => {
 
   async function removeFromHistory(id: string) {
     try {
-      await cryptoService.deleteFromHistory(id)
+      // Remove from backend (when implemented)
+      // await cryptoService.deleteFromHistory(id)
       searchHistory.value = searchHistory.value.filter(item => item.id !== id)
     } catch (err: any) {
       console.error('Error removing from history:', err)

@@ -38,7 +38,7 @@
           >
             <div class="activity-info">
               <span class="crypto-symbol">{{ item.symbol.toUpperCase() }}</span>
-              <span class="search-time">{{ formatDate(item.searchedAt) }}</span>
+              <span class="search-time">{{ formatDate(item.timestamp) }}</span>
             </div>
             <button 
               @click="searchAgain(item.symbol)"
@@ -82,8 +82,9 @@ const searchAgain = (symbol: string) => {
 }
 
 onMounted(async () => {
-  await authStore.fetchCurrentUser()
-  await cryptoStore.fetchSearchHistory()
+  // Disabled during development - uncomment when auth is re-enabled
+  // await authStore.fetchCurrentUser()
+  // await cryptoStore.fetchSearchHistory()
 })
 </script>
 

@@ -51,8 +51,19 @@
             <div class="item-info">
               <div class="crypto-symbol">{{ item.symbol.toUpperCase() }}</div>
               <div class="search-details">
-                <span class="search-date">{{ formatDate(item.searchedAt) }}</span>
-                <span class="search-time">{{ formatTime(item.searchedAt) }}</span>
+                <span class="search-date">{{ formatDate(item.timestamp) }}</span>
+                <span class="search-time">{{ formatTime(item.timestamp) }}</span>
+                <div class="crypto-data">
+                  <span class="crypto-price">${{ formatPrice(item.price) }}</span>
+                  <span 
+                    class="crypto-change"
+                    :class="{ positive: (item.change24h || 0) >= 0, negative: (item.change24h || 0) < 0 }"
+                  >
+                    {{ item.change24h !== undefined ? 
+                        ((item.change24h >= 0 ? '+' : '') + item.change24h.toFixed(2) + '%') : 
+                        'N/A' }}
+                  </span>
+                </div>
               </div>
             </div>
             
@@ -120,7 +131,7 @@ const filteredAndSortedHistory = computed(() => {
     let comparison = 0
     
     if (sortBy.value === 'searchedAt') {
-      comparison = new Date(a.searchedAt).getTime() - new Date(b.searchedAt).getTime()
+      comparison = new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
     } else {
       comparison = a.symbol.localeCompare(b.symbol)
     }
@@ -175,12 +186,21 @@ const removeFromHistory = async (id: string) => {
   await cryptoStore.removeFromHistory(id)
 }
 
+const formatPrice = (price: number) => {
+  if (price >= 1) {
+    return price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  } else {
+    return price.toFixed(6)
+  }
+}
+
 const toggleSortOrder = () => {
   sortOrder.value = sortOrder.value === 'desc' ? 'asc' : 'desc'
 }
 
 onMounted(async () => {
-  await cryptoStore.fetchSearchHistory()
+  // Disabled during development - uncomment when auth is re-enabled
+  // await cryptoStore.fetchSearchHistory()
 })
 </script>
 
@@ -381,6 +401,31 @@ onMounted(async () => {
 .search-time {
   color: rgba(255, 255, 255, 0.6);
   font-size: 0.8rem;
+}
+
+.crypto-data {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.crypto-price {
+  color: #f7d046;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.crypto-change {
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.crypto-change.positive {
+  color: #22c55e;
+}
+
+.crypto-change.negative {
+  color: #ef4444;
 }
 
 .item-actions {

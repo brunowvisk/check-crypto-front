@@ -41,9 +41,11 @@
             <span class="price">${{ formatPrice(cryptoStore.currentCrypto.price) }}</span>
             <span 
               class="change"
-              :class="{ positive: cryptoStore.currentCrypto.change24h >= 0, negative: cryptoStore.currentCrypto.change24h < 0 }"
+              :class="{ positive: (cryptoStore.currentCrypto.change24h || 0) >= 0, negative: (cryptoStore.currentCrypto.change24h || 0) < 0 }"
             >
-              {{ cryptoStore.currentCrypto.change24h >= 0 ? '+' : '' }}{{ cryptoStore.currentCrypto.change24h.toFixed(2) }}%
+              {{ cryptoStore.currentCrypto.change24h !== undefined ? 
+                  ((cryptoStore.currentCrypto.change24h >= 0 ? '+' : '') + cryptoStore.currentCrypto.change24h.toFixed(2) + '%') : 
+                  'N/A' }}
             </span>
           </div>
         </div>
@@ -132,7 +134,11 @@ const changeInterval = async (interval: string) => {
   }
 }
 
-const formatPrice = (price: number) => {
+const formatPrice = (price: number | undefined | null) => {
+  if (!price || price === 0) {
+    return '0.00'
+  }
+  
   if (price >= 1) {
     return price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
   } else {
@@ -140,7 +146,11 @@ const formatPrice = (price: number) => {
   }
 }
 
-const formatVolume = (volume: number) => {
+const formatVolume = (volume: number | undefined | null) => {
+  if (!volume || volume === 0) {
+    return 'N/A'
+  }
+  
   if (volume >= 1e9) {
     return (volume / 1e9).toFixed(2) + 'B'
   } else if (volume >= 1e6) {
@@ -152,13 +162,21 @@ const formatVolume = (volume: number) => {
   }
 }
 
-const formatTime = (timestamp: string) => {
-  return new Date(timestamp).toLocaleString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  })
+const formatTime = (timestamp: string | undefined | null) => {
+  if (!timestamp) {
+    return 'N/A'
+  }
+  
+  try {
+    return new Date(timestamp).toLocaleString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  } catch {
+    return 'Invalid Date'
+  }
 }
 
 onMounted(() => {
